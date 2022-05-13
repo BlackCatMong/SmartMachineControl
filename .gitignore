@@ -62,13 +62,11 @@ ExportedObj/
 sysinfo.txt
 
 # Builds
-*.apk
 *.unitypackage
 
 # Crashlytics generated file
 crashlytics-build.properties
 
-*.meta
 *.wav
 *.mp3
 *.jpg
@@ -76,7 +74,6 @@ crashlytics-build.properties
 *.controller
 *.png
 *.jpeg
-*.mat
 *.physicMaterial
 *.lighting
 *.asset
