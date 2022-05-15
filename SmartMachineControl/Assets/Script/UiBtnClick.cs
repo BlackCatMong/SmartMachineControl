@@ -7,7 +7,7 @@ using UnityEngine.XR.ARSubsystems;
 public class UiBtnClick : MonoBehaviour
 {
     public GameObject indicator;
-    public GameObject workLocation;
+    public GameObject workAreaPrefabs;
 
     ARRaycastManager arRaycastManager;
     bool indicatorOn;
@@ -15,26 +15,24 @@ public class UiBtnClick : MonoBehaviour
     void Start()
     {
         indicatorOn = false;
+        indicator = Instantiate(indicator);
         indicator.SetActive(false);
-
+        
         arRaycastManager = GetComponent<ARRaycastManager>();
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
         CreateLocation();
-        CreateWorkLocation();
+        CreateWorkArea();
     }
     //지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
     public void CreateCubeClick()
     {
         indicatorOn = !indicatorOn;
-
-        if(indicatorOn)
-            Debug.Log("indicatorOn = true");
-        else
-            Debug.Log("indicatorOn = false");
     }
     //필요한 경우 생성위치 표현용 .. 
     void CreateLocation()
@@ -58,16 +56,14 @@ public class UiBtnClick : MonoBehaviour
             indicator.SetActive(false);
         }
     }
-    void CreateWorkLocation()
+    void CreateWorkArea()
     {
         if(indicator.activeInHierarchy && indicatorOn && Input.touchCount > 0)
         {
-            Debug.Log("Create Location Input > 0");
             Touch touch = Input.GetTouch(0);
             if(touch.phase == TouchPhase.Began)
             {
-                Debug.Log("Create Location Phase Began ...");
-                Instantiate(workLocation, indicator.transform.position, indicator.transform.rotation);
+                Instantiate(workAreaPrefabs, indicator.transform.position, indicator.transform.rotation);
                 indicatorOn = false;
             }
         }
