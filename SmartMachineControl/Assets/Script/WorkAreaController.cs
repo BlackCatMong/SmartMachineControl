@@ -22,6 +22,7 @@ public class WorkAreaController : MonoBehaviour
 
 	Quaternion originRotation = new Quaternion();
 	Vector3 originScale = new Vector3();
+	Vector3 originPosition = new Vector3();
 
 	// Start is called before the first frame update
 	void Start()
@@ -88,6 +89,10 @@ public class WorkAreaController : MonoBehaviour
 		{
 			workArea.transform.localScale = originScale;
 		}
+		else if(moveFlag)
+		{
+			workArea.transform.position = originPosition;
+		}
 		SelectBtnActiveOnOff(false);
 		AllFlagOff();
 
@@ -141,7 +146,7 @@ public class WorkAreaController : MonoBehaviour
 					SelectBtnActiveOnOff(false);
 					originRotation = workArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
 					originScale = workArea.transform.localScale;
-
+					originPosition = workArea.transform.position;
 
 				}
             }
@@ -163,16 +168,19 @@ public class WorkAreaController : MonoBehaviour
 			}
 		}
 	}
-	void Move()//인디케이터를 만들어야하나 ....
+	void Move()
 	{
+		Vector2 touchMoveDis = new Vector2(0f, 0f);
 		if(moveFlag)
 		{
 			if(Input.touchCount > 0)
 			{
 				Touch touch = Input.GetTouch(0);
-				if(touch.phase == TouchPhase.Began)
+				if(touch.phase == TouchPhase.Moved)
 				{
-
+					touchMoveDis = touch.deltaPosition;
+					Vector3 tmp = touchMoveDis;
+					workArea.transform.position = workArea.transform.position + tmp * 0.001f;
 				}
 			}
 		}
