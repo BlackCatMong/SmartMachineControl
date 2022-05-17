@@ -322,6 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dee3cf014e150846b0a92b83d85e237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  workArea: {fileID: 3167323989392903027}
   canvasActiveBtn: {fileID: 6736032700101368936}
   canvasSelectBtn: {fileID: 4877312481491689630}
 --- !u!1 &3167323991019273154

@@ -7,41 +7,46 @@ using UnityEngine.EventSystems;
 
 public class WorkAreaController : MonoBehaviour
 {
+	public GameObject workArea;
     public GameObject canvasActiveBtn;
 	public GameObject canvasSelectBtn;
-
-	Button OkBtn;
-	Button CancelBtn;
 
 	bool[] flagIndex;
 
 	bool sizeChangeFlag;
 	bool rotateChangeFlag;
 	bool moveFlag;
+	float oldTouchMoveDis;
+
+	Vector3 deltaPos = new Vector3();
+
+	Quaternion originRotation = new Quaternion();
+	Vector3 originScale = new Vector3();
 
 	// Start is called before the first frame update
 	void Start()
     {
-		flagIndex = new bool[] {sizeChangeFlag, rotateChangeFlag, moveFlag};
+		flagIndex = new bool[] {sizeChangeFlag, rotateChangeFlag, moveFlag}; //배열을 주솟값으로 해야할듯 .
 
-		for (int i = 0; i < flagIndex.Length; i++)
+		for (int i = 0; i < flagIndex.Length; i++) //false로 초기화 ..
 			flagIndex[i] = false;
-
+		
 		Debug.Log("Bool Index Count -> " + flagIndex.Length);
-		canvasSelectBtn.SetActive(false);
+		AllFlagOff();
+		SelectBtnActiveOnOff(false); //OK False 버튼안보이게 ..
 
-		OkBtn = canvasSelectBtn.GetComponent<Transform>().GetChild(0).GetComponent<Button>();
-		CancelBtn = canvasSelectBtn.GetComponent<Transform>().GetChild(1).GetComponent<Button>();
-    }
+		originRotation = workArea.transform.rotation;
+		oldTouchMoveDis = 0;
+	}
 
     // Update is called once per frame
     void Update()
     {
-		SaveFlagIndex();
-        ButtonCheck();
-		RotateChange();
-		Move();
-		SizeChange();
+		SaveFlagIndex(); //배열 주솟값으로 변경하면 삭제 ..
+        ButtonCheck(); // 버튼 클릭하면 색변경 및 다른 버튼 안보이게 ..
+		RotateChange(); // 회전값 변경 ..
+		Move(); //이동 ..
+		SizeChange(); //사이즈 변경
     }
 	void SaveFlagIndex() // 배열을 주소값 참조로 변경해야될듯...ㅠㅠㅠㅠㅠㅠㅠ
 	{
@@ -64,26 +69,41 @@ public class WorkAreaController : MonoBehaviour
     {
         Debug.Log("RotateChange");
         rotateChangeFlag = !rotateChangeFlag;
-    }
+	}
 	public void OkBtnClick()
 	{
 		Debug.Log("Ok Button Click");
-		canvasSelectBtn.SetActive(false);
+		SelectBtnActiveOnOff(false);
 		AllFlagOff();
 	}
-	public void CancelBtnClick()
+	public void CancelBtnClick() 
 	{
 		Debug.Log("Cancel Button Click");
-		canvasSelectBtn.SetActive(false);
+		if (rotateChangeFlag)
+		{
+			Debug.Log("Cancel Btn Click Origin Transform Rotate .. -> " + originRotation);
+			workArea.transform.rotation = originRotation;
+		}
+		else if(sizeChangeFlag)
+		{
+			workArea.transform.localScale = originScale;
+		}
+		SelectBtnActiveOnOff(false);
 		AllFlagOff();
 
+		
+
 	}
-	void AllFlagOff()
+	public void SelectBtnActiveOnOff(bool onOff)
 	{
-		for (int i = 0; i < flagIndex.Length; i++)
-		{
-			flagIndex[i] = false;
-		}
+		for (int i = 0; i < canvasSelectBtn.transform.childCount; i++)
+			canvasSelectBtn.transform.GetChild(i).transform.gameObject.SetActive(onOff);
+	}
+	void AllFlagOff() //여기도 주소값 참조로 바꿔야할듯 ㅜㅜ
+	{
+		sizeChangeFlag = false;
+		moveFlag = false;
+		rotateChangeFlag = false;
 	}
 	void ButtonCheck()	
     {
@@ -101,7 +121,7 @@ public class WorkAreaController : MonoBehaviour
                     {
                         canvasButton = canvasActiveBtn.transform.GetChild(j).gameObject;
                         canvasButton.SetActive(false);
-						canvasSelectBtn.SetActive(true);
+						SelectBtnActiveOnOff(true);
                     }
                 }
                 flagCheck = true;
@@ -118,21 +138,68 @@ public class WorkAreaController : MonoBehaviour
                 {
 					canvasButton = canvasActiveBtn.transform.GetChild(j).gameObject;
                     canvasButton.SetActive(true);
-					canvasSelectBtn.SetActive(false);
+					SelectBtnActiveOnOff(false);
+					originRotation = workArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
+					originScale = workArea.transform.localScale;
+
+
 				}
             }
         }
     }
 	void RotateChange()
 	{
+		if (rotateChangeFlag)
+		{
+			if(Input.touchCount > 0)
+			{
+				Touch touch = Input.GetTouch(0);
+				if(touch.phase == TouchPhase.Moved)
+				{
+					deltaPos = touch.deltaPosition;
 
+					workArea.transform.Rotate(transform.up, deltaPos.x * -1.0f * 0.1f);
+				}
+			}
+		}
 	}
-	void Move()
+	void Move()//인디케이터를 만들어야하나 ....
 	{
+		if(moveFlag)
+		{
+			if(Input.touchCount > 0)
+			{
+				Touch touch = Input.GetTouch(0);
+				if(touch.phase == TouchPhase.Began)
+				{
 
+				}
+			}
+		}
 	}
 	void SizeChange()
 	{
+		float touchMovedDis = 0f;
+		float disDiff = 0f;
+		if(sizeChangeFlag)
+		{
+			if(Input.touchCount > 1)
+			{
+				Touch touch0 = Input.GetTouch(0);
+				Touch touch1 = Input.GetTouch(1);
+				if(touch0.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Moved)
+				{
+					touchMovedDis = (touch0.position - touch1.position).sqrMagnitude;
+					disDiff = touchMovedDis - oldTouchMoveDis;
 
+					if (disDiff > 0)
+						workArea.transform.localScale *= 1.1f;
+					else if (disDiff < 0)
+						workArea.transform.localScale *= 0.9f;
+
+					oldTouchMoveDis = touchMovedDis;
+				}
+			}
+		}
 	}
 }
