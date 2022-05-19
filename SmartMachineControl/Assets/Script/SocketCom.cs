@@ -10,7 +10,6 @@ using UnityEngine;
 public class SocketCom : MonoBehaviour
 {
 	string serverIp = "172.30.1.23";
-	//string serverIp = "localhost";
 	int serverPort = 5556;
 
 	private static TcpClient tcpClient = new TcpClient();
@@ -56,7 +55,7 @@ public class SocketCom : MonoBehaviour
 						if (Stopwatch.ElapsedMilliseconds > 1000)
 						{
 							Debug.Log(" TCP Not Connect ");
-							tcpClient.BeginConnect(serverIp, serverPort);
+							tcpClient.Connect(serverIp, serverPort);
 							Stopwatch.Restart();
 						}
 						else

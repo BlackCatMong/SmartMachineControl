@@ -8,21 +8,18 @@ using UnityEngine.UI;
 
 public class UiBtnClick : MonoBehaviour
 {
-    public GameObject indicator;
-    public GameObject workAreaPrefabs;
-    public GameObject canvas;
+    public GameObject mIndicator;			// 오브젝트 생성 위치 표시 ..
+    public GameObject mWorkAreaPrefabs;		// 작업 오브젝트 프리팹
+    public GameObject mCanvas;				// UI 
 
-    ARRaycastManager arRaycastManager;
+    ARRaycastManager mArRaycastManager;		//Ray 관리 .. 
     
-    bool indicatorOn;
+    bool mIndicatorOn;						//오브젝트 생성을 위해 인디케이터 유무 확인 
+
     // Start is called before the first frame update
     void Start()
     {
-        indicatorOn = false;
-        indicator = Instantiate(indicator);
-        indicator.SetActive(false);
-        
-        arRaycastManager = GetComponent<ARRaycastManager>();
+		FirstInit();
     }
 
     // Update is called once per frame
@@ -32,57 +29,63 @@ public class UiBtnClick : MonoBehaviour
         CreateWorkArea();
         ButtonCheck();
     }
+	void FirstInit()
+	{
+		mIndicatorOn = false;
+		mIndicator = Instantiate(mIndicator);
+		mIndicator.SetActive(false);
+		mArRaycastManager = GetComponent<ARRaycastManager>();
+	}
     //지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
     public void CreateCubeClick()
     {
-        indicatorOn = !indicatorOn;
+		mIndicatorOn = !mIndicatorOn;
     }
-    //필요한 경우 생성위치 표현용 .. 
+    //생성위치 표현용 .. 
     void CreateLocation()
     {
-        Vector2 screenSize = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        Vector2 screenSize = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f); //화면 가운데
 
         List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
 
-        if(arRaycastManager.Raycast(screenSize, aRRaycastHits, TrackableType.Planes) && indicatorOn)
+        if(mArRaycastManager.Raycast(screenSize, aRRaycastHits, TrackableType.Planes) && mIndicatorOn) //화면 가운데 Plane이 있으면
         {
-            indicator.SetActive(true);
+			mIndicator.SetActive(true); //생성 위치 표기
 
-          indicator.transform.position = aRRaycastHits[0].pose.position;
-            indicator.transform.rotation = aRRaycastHits[0].pose.rotation;
+			mIndicator.transform.position = aRRaycastHits[0].pose.position;
+			mIndicator.transform.rotation = aRRaycastHits[0].pose.rotation;
 
-            indicator.transform.position += indicator.transform.up * 0.1f; // 겹치므로 올려줌
-
+			mIndicator.transform.position += mIndicator.transform.up * 0.1f; // 겹치므로 올려줌
         }
         else
         {
-            indicator.SetActive(false);
+			mIndicator.SetActive(false);
         }
     }
     //작업 구역 생성..
     void CreateWorkArea()
     {
-        if(indicator.activeInHierarchy && indicatorOn && Input.touchCount > 0)
+        if(mIndicator.activeInHierarchy && mIndicatorOn && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
             if(touch.phase == TouchPhase.Began && !EventSystem.current.currentSelectedGameObject)
             {
-                Instantiate(workAreaPrefabs, indicator.transform.position, indicator.transform.rotation);
-                indicatorOn = false;
+                Instantiate(mWorkAreaPrefabs, mIndicator.transform.position, mIndicator.transform.rotation);
+				mIndicatorOn = false;
             }
         }
     }
     //Button 눌렀을때 확인
     void ButtonCheck()
     {
-        if (indicatorOn)
+        if (mIndicatorOn)
         {
-            GameObject canvasButton = canvas.transform.GetChild(0).gameObject;
+            GameObject canvasButton = mCanvas.transform.GetChild(0).gameObject;
             canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.pressedColor;
         }
         else
         {
-            GameObject canvasButton = canvas.transform.GetChild(0).gameObject;
+            GameObject canvasButton = mCanvas.transform.GetChild(0).gameObject;
             canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.normalColor;
         }
     }

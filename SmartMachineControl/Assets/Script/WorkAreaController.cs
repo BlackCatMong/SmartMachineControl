@@ -7,37 +7,39 @@ using UnityEngine.EventSystems;
 
 public class WorkAreaController : MonoBehaviour
 {
-	public GameObject workArea;
-    public GameObject canvasActiveBtn;
-	public GameObject canvasSelectBtn;
+	public GameObject mWorkArea;
+    public GameObject mCanvasActiveBtn;
+	public GameObject mCanvasSelectBtn;
 
-	bool[] flagIndex;
+	bool[] mFlagIndex;
 
-	bool sizeChangeFlag;
-	bool rotateChangeFlag;
-	bool moveFlag;
-	float oldTouchMoveDis;
+	bool mSizeChangeFlag;
+	bool mRotateChangeFlag;
+	bool mMoveFlag;
+	float mOldTouchMoveDis;
 
-	Vector3 deltaPos = new Vector3();
+	Vector3 mDeltaPos = new Vector3();
 
-	Quaternion originRotation = new Quaternion();
-	Vector3 originScale = new Vector3();
-	Vector3 originPosition = new Vector3();
+	Quaternion mOriginRotation = new Quaternion();
+	Vector3 mOriginScale = new Vector3();
+	Vector3 mOriginPosition = new Vector3();
+
+
 
 	// Start is called before the first frame update
 	void Start()
     {
-		flagIndex = new bool[] {sizeChangeFlag, rotateChangeFlag, moveFlag}; //배열을 주솟값으로 해야할듯 .
+		mFlagIndex = new bool[] { mSizeChangeFlag, mRotateChangeFlag, mMoveFlag}; //배열을 주솟값으로 해야할듯 .
 
-		for (int i = 0; i < flagIndex.Length; i++) //false로 초기화 ..
-			flagIndex[i] = false;
+		for (int i = 0; i < mFlagIndex.Length; i++) //false로 초기화 ..
+			mFlagIndex[i] = false;
 		
-		Debug.Log("Bool Index Count -> " + flagIndex.Length);
+		Debug.Log("Bool Index Count -> " + mFlagIndex.Length);
 		AllFlagOff();
 		SelectBtnActiveOnOff(false); //OK False 버튼안보이게 ..
 
-		originRotation = workArea.transform.rotation;
-		oldTouchMoveDis = 0;
+		mOriginRotation = mWorkArea.transform.rotation;
+		mOldTouchMoveDis = 0;
 	}
 
     // Update is called once per frame
@@ -51,25 +53,25 @@ public class WorkAreaController : MonoBehaviour
     }
 	void SaveFlagIndex() // 배열을 주소값 참조로 변경해야될듯...ㅠㅠㅠㅠㅠㅠㅠ
 	{
-		flagIndex[0] = sizeChangeFlag;
-		flagIndex[1] = moveFlag; 
-		flagIndex[2] = rotateChangeFlag;
+		mFlagIndex[0] = mSizeChangeFlag;
+		mFlagIndex[1] = mMoveFlag;
+		mFlagIndex[2] = mRotateChangeFlag;
 	}
 
 	public void SizeChangeBtnClick()
     {
         Debug.Log("SizeChange");
-        sizeChangeFlag = !sizeChangeFlag;
+		mSizeChangeFlag = !mSizeChangeFlag;
     }
     public void MoveBtnClick()
     {
         Debug.Log("Move");
-        moveFlag = !moveFlag;
+		mMoveFlag = !mMoveFlag;
     }
     public void RotateChangeBtnClick()
     {
         Debug.Log("RotateChange");
-        rotateChangeFlag = !rotateChangeFlag;
+		mRotateChangeFlag = !mRotateChangeFlag;
 	}
 	public void OkBtnClick()
 	{
@@ -80,51 +82,48 @@ public class WorkAreaController : MonoBehaviour
 	public void CancelBtnClick() 
 	{
 		Debug.Log("Cancel Button Click");
-		if (rotateChangeFlag)
+		if (mRotateChangeFlag)
 		{
-			Debug.Log("Cancel Btn Click Origin Transform Rotate .. -> " + originRotation);
-			workArea.transform.rotation = originRotation;
+			Debug.Log("Cancel Btn Click Origin Transform Rotate .. -> " + mOriginRotation);
+			mWorkArea.transform.rotation = mOriginRotation;
 		}
-		else if(sizeChangeFlag)
+		else if(mRotateChangeFlag)
 		{
-			workArea.transform.localScale = originScale;
+			mWorkArea.transform.localScale = mOriginScale;
 		}
-		else if(moveFlag)
+		else if(mMoveFlag)
 		{
-			workArea.transform.position = originPosition;
+			mWorkArea.transform.position = mOriginPosition;
 		}
 		SelectBtnActiveOnOff(false);
 		AllFlagOff();
-
-		
-
 	}
 	public void SelectBtnActiveOnOff(bool onOff)
 	{
-		for (int i = 0; i < canvasSelectBtn.transform.childCount; i++)
-			canvasSelectBtn.transform.GetChild(i).transform.gameObject.SetActive(onOff);
+		for (int i = 0; i < mCanvasSelectBtn.transform.childCount; i++)
+			mCanvasSelectBtn.transform.GetChild(i).transform.gameObject.SetActive(onOff);
 	}
 	void AllFlagOff() //여기도 주소값 참조로 바꿔야할듯 ㅜㅜ
 	{
-		sizeChangeFlag = false;
-		moveFlag = false;
-		rotateChangeFlag = false;
+		mSizeChangeFlag = false;
+		mMoveFlag = false;
+		mRotateChangeFlag = false;
 	}
 	void ButtonCheck()	
     {
         bool flagCheck = false;
-		for (int i = 0; i < flagIndex.Length; i++)
+		for (int i = 0; i < mFlagIndex.Length; i++)
         {
-            GameObject canvasButton = canvasActiveBtn.transform.GetChild(i).gameObject;
+            GameObject canvasButton = mCanvasActiveBtn.transform.GetChild(i).gameObject;
 
-            if (flagIndex[i])
+            if (mFlagIndex[i])
             {
                 canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.pressedColor;
-                for (int j = 0; j < canvasActiveBtn.transform.childCount; j++)
+                for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
                 {
                     if (i != j)
                     {
-                        canvasButton = canvasActiveBtn.transform.GetChild(j).gameObject;
+                        canvasButton = mCanvasActiveBtn.transform.GetChild(j).gameObject;
                         canvasButton.SetActive(false);
 						SelectBtnActiveOnOff(true);
                     }
@@ -137,16 +136,16 @@ public class WorkAreaController : MonoBehaviour
             
             }
             
-            if ((i == flagIndex.Length - 1) && !flagCheck)
+            if ((i == mFlagIndex.Length - 1) && !flagCheck)
             {
-                for (int j = 0; j < canvasActiveBtn.transform.childCount; j++)
+                for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
                 {
-					canvasButton = canvasActiveBtn.transform.GetChild(j).gameObject;
+					canvasButton = mCanvasActiveBtn.transform.GetChild(j).gameObject;
                     canvasButton.SetActive(true);
 					SelectBtnActiveOnOff(false);
-					originRotation = workArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
-					originScale = workArea.transform.localScale;
-					originPosition = workArea.transform.position;
+					mOriginRotation = mWorkArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
+					mOriginScale = mWorkArea.transform.localScale;
+					mOriginPosition = mWorkArea.transform.position;
 
 				}
             }
@@ -154,16 +153,16 @@ public class WorkAreaController : MonoBehaviour
     }
 	void RotateChange()
 	{
-		if (rotateChangeFlag)
+		if (mRotateChangeFlag)
 		{
 			if(Input.touchCount > 0)
 			{
 				Touch touch = Input.GetTouch(0);
 				if(touch.phase == TouchPhase.Moved)
 				{
-					deltaPos = touch.deltaPosition;
+					mDeltaPos = touch.deltaPosition;
 
-					workArea.transform.Rotate(transform.up, deltaPos.x * -1.0f * 0.1f);
+					mWorkArea.transform.Rotate(transform.up, mDeltaPos.x * -1.0f * 0.1f);
 				}
 			}
 		}
@@ -171,7 +170,7 @@ public class WorkAreaController : MonoBehaviour
 	void Move()
 	{
 		Vector2 touchMoveDis = new Vector2(0f, 0f);
-		if(moveFlag)
+		if(mMoveFlag)
 		{
 			if(Input.touchCount > 0)
 			{
@@ -180,7 +179,7 @@ public class WorkAreaController : MonoBehaviour
 				{
 					touchMoveDis = touch.deltaPosition;
 					Vector3 tmp = touchMoveDis;
-					workArea.transform.position = workArea.transform.position + tmp * 0.001f;
+					mWorkArea.transform.position = mWorkArea.transform.position + tmp * 0.001f;
 				}
 			}
 		}
@@ -189,7 +188,7 @@ public class WorkAreaController : MonoBehaviour
 	{
 		float touchMovedDis = 0f;
 		float disDiff = 0f;
-		if(sizeChangeFlag)
+		if(mRotateChangeFlag)
 		{
 			if(Input.touchCount > 1)
 			{
@@ -198,14 +197,14 @@ public class WorkAreaController : MonoBehaviour
 				if(touch0.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Moved)
 				{
 					touchMovedDis = (touch0.position - touch1.position).sqrMagnitude;
-					disDiff = touchMovedDis - oldTouchMoveDis;
+					disDiff = touchMovedDis - mOldTouchMoveDis;
 
 					if (disDiff > 0)
-						workArea.transform.localScale *= 1.1f;
+						mWorkArea.transform.localScale *= 1.1f;
 					else if (disDiff < 0)
-						workArea.transform.localScale *= 0.9f;
+						mWorkArea.transform.localScale *= 0.9f;
 
-					oldTouchMoveDis = touchMovedDis;
+					mOldTouchMoveDis = touchMovedDis;
 				}
 			}
 		}
