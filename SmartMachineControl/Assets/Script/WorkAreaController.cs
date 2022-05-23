@@ -18,6 +18,7 @@ public class WorkAreaController : MonoBehaviour
 	bool mRotateChangeFlag;
 	bool mMoveFlag;
 	bool mDeleteFlag;
+
 	float mOldTouchMoveDis;
 
 	int mClickCount;
@@ -41,6 +42,7 @@ public class WorkAreaController : MonoBehaviour
 		Debug.Log("Bool Index Count -> " + mFlagIndex.Length);
 		AllFlagOff();
 		SelectBtnActiveOnOff(false); //OK False 버튼안보이게 ..
+
 		mCanvasPopUp.SetActive(false); // Pop Off
 
 		mOriginRotation = mWorkArea.transform.rotation;
@@ -286,21 +288,30 @@ public class WorkAreaController : MonoBehaviour
 	}
 	void PopUpDataCheck()
 	{
-		string[] objectTransform =
-			new string[] { mWorkArea.transform.position.ToString(), mWorkArea.transform.rotation.ToString(), mWorkArea.transform.localScale.ToString() };
-		if(mCanvasPopUp.activeInHierarchy)
+		if (!GetAllFlag() && !mDeleteFlag)
 		{
-			GameObject dataValue = mCanvasPopUp.transform.Find("Data").transform.Find("DataValue").gameObject;
-			int objectCount = dataValue.transform.childCount;
-			for (int i = 0; i <= objectCount; i++)
+			string[] objectTransform =
+				new string[] { mWorkArea.transform.position.ToString(), mWorkArea.transform.rotation.ToString(),	mWorkArea.transform.localScale.ToString() };//for문으로 한번에 작업용
+
+			if(mCanvasPopUp.activeInHierarchy) //하이어라키에 활성화 되면 ..
 			{
-				GameObject textDataValue = dataValue.transform.GetChild(i).gameObject;
-				textDataValue.GetComponent<Text>().text = objectTransform[i];
+				GameObject dataValue = mCanvasPopUp.transform.Find("Data").transform.Find("DataValue").gameObject;
+				int objectCount = dataValue.transform.childCount;
+				for (int i = 0; i < objectCount; i++)
+				{
+					GameObject textDataValue = dataValue.transform.GetChild(i).gameObject;
+					textDataValue.GetComponent<Text>().text = objectTransform[i];
+				}
 			}
 		}
 	}
 	public void PopUpClose()
 	{
 		mCanvasPopUp.SetActive(false);
+	}
+	public void DeleteObject()
+	{
+		mCanvasPopUp.SetActive(false);
+		mDeleteFlag = true;
 	}
 }
