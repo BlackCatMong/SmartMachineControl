@@ -10,13 +10,17 @@ public class WorkAreaController : MonoBehaviour
 	public GameObject mWorkArea;
     public GameObject mCanvasActiveBtn;
 	public GameObject mCanvasSelectBtn;
+	public GameObject mCanvasPopUp;
 
 	bool[] mFlagIndex;
 
 	bool mSizeChangeFlag;
 	bool mRotateChangeFlag;
 	bool mMoveFlag;
+	bool mDeleteFlag;
 	float mOldTouchMoveDis;
+
+	int mClickCount;
 
 	Vector3 mDeltaPos = new Vector3();
 
@@ -24,7 +28,7 @@ public class WorkAreaController : MonoBehaviour
 	Vector3 mOriginScale = new Vector3();
 	Vector3 mOriginPosition = new Vector3();
 
-
+	System.Diagnostics.Stopwatch mStopwatch = new System.Diagnostics.Stopwatch();
 
 	// Start is called before the first frame update
 	void Start()
@@ -37,9 +41,12 @@ public class WorkAreaController : MonoBehaviour
 		Debug.Log("Bool Index Count -> " + mFlagIndex.Length);
 		AllFlagOff();
 		SelectBtnActiveOnOff(false); //OK False 버튼안보이게 ..
+		mCanvasPopUp.SetActive(false); // Pop Off
 
 		mOriginRotation = mWorkArea.transform.rotation;
 		mOldTouchMoveDis = 0;
+		mStopwatch.Reset();
+		mClickCount = 0;
 	}
 
     // Update is called once per frame
@@ -50,7 +57,9 @@ public class WorkAreaController : MonoBehaviour
 		RotateChange(); // 회전값 변경 ..
 		Move(); //이동 ..
 		SizeChange(); //사이즈 변경
-    }
+		StopWatchCheck();
+		PopUpDataCheck();
+	}
 	void SaveFlagIndex() // 배열을 주소값 참조로 변경해야될듯...ㅠㅠㅠㅠㅠㅠㅠ
 	{
 		mFlagIndex[0] = mSizeChangeFlag;
@@ -76,8 +85,23 @@ public class WorkAreaController : MonoBehaviour
 	public void OkBtnClick()
 	{
 		Debug.Log("Ok Button Click");
+		if(mDeleteFlag)
+		{
+			mDeleteFlag = false;
+			Destroy(mWorkArea);
+		}
 		SelectBtnActiveOnOff(false);
 		AllFlagOff();
+	}
+	bool GetAllFlag()
+	{
+		bool returnFlag = false;
+		for(int i = 0; i < mFlagIndex.Length; i++)
+		{
+			returnFlag = returnFlag || mFlagIndex[i];
+		}
+		return returnFlag;
+
 	}
 	public void CancelBtnClick() 
 	{
@@ -87,13 +111,18 @@ public class WorkAreaController : MonoBehaviour
 			Debug.Log("Cancel Btn Click Origin Transform Rotate .. -> " + mOriginRotation);
 			mWorkArea.transform.rotation = mOriginRotation;
 		}
-		else if(mRotateChangeFlag)
+		else if(mSizeChangeFlag)
 		{
 			mWorkArea.transform.localScale = mOriginScale;
 		}
 		else if(mMoveFlag)
 		{
 			mWorkArea.transform.position = mOriginPosition;
+		}
+		else if (mDeleteFlag)
+		{
+			//mWorkArea.GetComponent<MeshRenderer>().enabled = true;
+			mDeleteFlag = false;
 		}
 		SelectBtnActiveOnOff(false);
 		AllFlagOff();
@@ -111,12 +140,13 @@ public class WorkAreaController : MonoBehaviour
 	}
 	void ButtonCheck()	
     {
-        bool flagCheck = false;
+		//bool flagCheck = false;
+		GameObject canvasButton;
 		for (int i = 0; i < mFlagIndex.Length; i++)
         {
-            GameObject canvasButton = mCanvasActiveBtn.transform.GetChild(i).gameObject;
+            canvasButton = mCanvasActiveBtn.transform.GetChild(i).gameObject;
 
-            if (mFlagIndex[i])
+            if (mFlagIndex[i])//true인 Index찾으면 ..
             {
                 canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.pressedColor;
                 for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
@@ -128,29 +158,46 @@ public class WorkAreaController : MonoBehaviour
 						SelectBtnActiveOnOff(true);
                     }
                 }
-                flagCheck = true;
+                //flagCheck = true;	//눌린 Button이 있다 ..
             }
             else
             {
                 canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.normalColor;
-            
             }
-            
-            if ((i == mFlagIndex.Length - 1) && !flagCheck)
-            {
-                for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
-                {
-					canvasButton = mCanvasActiveBtn.transform.GetChild(j).gameObject;
-                    canvasButton.SetActive(true);
-					SelectBtnActiveOnOff(false);
-					mOriginRotation = mWorkArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
-					mOriginScale = mWorkArea.transform.localScale;
-					mOriginPosition = mWorkArea.transform.position;
-
-				}
-            }
-        }
-    }
+//
+//		if ((i == mFlagIndex.Length - 1) && !flagCheck) //for문 마지막에 체크 ..? 그냥 밖으로 빼면 된거 아닌가 .. 
+//		{
+//			for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
+//			{
+//				canvasButton = mCanvasActiveBtn.transform.GetChild(j).gameObject;
+//				canvasButton.SetActive(true);
+//				SelectBtnActiveOnOff(false);
+//				mOriginRotation = mWorkArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
+//				mOriginScale = mWorkArea.transform.localScale;
+//				mOriginPosition = mWorkArea.transform.position;
+//			}
+//		}
+		}
+		//if(!flagCheck && !mDeleteFlag)
+		if(mDeleteFlag) // 삭제 확인 메세지 출력및 다른 버튼 비활성화 필요..
+		{
+			SelectBtnActiveOnOff(true);
+			mCanvasActiveBtn.SetActive(false);
+		}
+		else if (!GetAllFlag())
+		{
+			mCanvasActiveBtn.SetActive(true);
+			for (int j = 0; j < mCanvasActiveBtn.transform.childCount; j++)
+			{
+				canvasButton = mCanvasActiveBtn.transform.GetChild(j).gameObject;
+				canvasButton.SetActive(true);
+				SelectBtnActiveOnOff(false);
+				mOriginRotation = mWorkArea.transform.rotation; // 기존 값 저장 후 취소시 원복을 위해 .. 
+				mOriginScale = mWorkArea.transform.localScale;
+				mOriginPosition = mWorkArea.transform.position;
+			}
+		}
+	}
 	void RotateChange()
 	{
 		if (mRotateChangeFlag)
@@ -188,7 +235,7 @@ public class WorkAreaController : MonoBehaviour
 	{
 		float touchMovedDis = 0f;
 		float disDiff = 0f;
-		if(mRotateChangeFlag)
+		if(mSizeChangeFlag)
 		{
 			if(Input.touchCount > 1)
 			{
@@ -208,5 +255,52 @@ public class WorkAreaController : MonoBehaviour
 				}
 			}
 		}
+	}
+	private void OnMouseDown()
+	{
+		if(!mDeleteFlag && !GetAllFlag()) // 다른 버튼을 눌럿을 경우에 삭제 안되도록 .. 
+		{
+			switch (mClickCount)
+			{
+				case 0:
+					mStopwatch.Start();
+					mClickCount++;
+					break;
+				case 1:
+					//mWorkArea.GetComponent<MeshRenderer>().enabled = false;
+					//mDeleteFlag = true;
+					mCanvasPopUp.SetActive(true); 
+					break;
+			}
+		}
+		
+	}
+	void StopWatchCheck() //더블클릭용 시간 체크 .. 
+	{
+		if (mStopwatch.ElapsedMilliseconds > 500)
+		{
+			mStopwatch.Stop();
+			mStopwatch.Reset();
+			mClickCount = 0;
+		}
+	}
+	void PopUpDataCheck()
+	{
+		string[] objectTransform =
+			new string[] { mWorkArea.transform.position.ToString(), mWorkArea.transform.rotation.ToString(), mWorkArea.transform.localScale.ToString() };
+		if(mCanvasPopUp.activeInHierarchy)
+		{
+			GameObject dataValue = mCanvasPopUp.transform.Find("Data").transform.Find("DataValue").gameObject;
+			int objectCount = dataValue.transform.childCount;
+			for (int i = 0; i <= objectCount; i++)
+			{
+				GameObject textDataValue = dataValue.transform.GetChild(i).gameObject;
+				textDataValue.GetComponent<Text>().text = objectTransform[i];
+			}
+		}
+	}
+	public void PopUpClose()
+	{
+		mCanvasPopUp.SetActive(false);
 	}
 }
