@@ -728,7 +728,7 @@ GameObject:
   - component: {fileID: 3550113445216867792}
   m_Layer: 6
   m_Name: WorkArea
-  m_TagString: Untagged
+  m_TagString: WorkArea
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

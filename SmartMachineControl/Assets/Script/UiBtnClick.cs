@@ -23,8 +23,12 @@ public class UiBtnClick : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		FirstInit();
-    }
+		mIndicatorOn = false;
+		mIndicator = Instantiate(mIndicator);
+		mIndicator.SetActive(false);
+		mArRaycastManager = GetComponent<ARRaycastManager>();
+		mDataUIChildName = new string[] { "Date", "Speed", "Gear", "Battery", "WorkTime" };
+	}
 
     // Update is called once per frame
     void Update()
@@ -35,14 +39,6 @@ public class UiBtnClick : MonoBehaviour
 		TestFunc();
 	}
 
-	void FirstInit()
-	{
-		mIndicatorOn = false;
-		mIndicator = Instantiate(mIndicator);
-		mIndicator.SetActive(false);
-		mArRaycastManager = GetComponent<ARRaycastManager>();
-		mDataUIChildName = new string[] { "Date", "Speed", "Gear", "Battery", "WorkTime"};
-	}
     //지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
     public void CreateCubeClick()
     {
@@ -72,17 +68,18 @@ public class UiBtnClick : MonoBehaviour
     //작업 구역 생성..
     void CreateWorkArea()
     {
-        if(mIndicator.activeInHierarchy && mIndicatorOn && Input.touchCount > 0)
+        if(mIndicator.activeInHierarchy && mIndicatorOn && Input.touchCount > 0 )
         {
             Touch touch = Input.GetTouch(0);
             if(touch.phase == TouchPhase.Began && !EventSystem.current.currentSelectedGameObject)
             {
                 Instantiate(mWorkAreaPrefabs, mIndicator.transform.position, mIndicator.transform.rotation);
 				mIndicatorOn = false;
+				Debug.Log("Object Create !!!!!!!!!!!!");
             }
         }
     }
-    //Button 눌렀을때 확인
+    //Button 눌렀을때 버튼 색 변경
     void ButtonCheck()
     {
         if (mIndicatorOn)

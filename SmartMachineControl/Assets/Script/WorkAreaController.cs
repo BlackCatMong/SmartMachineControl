@@ -314,4 +314,6 @@ public class WorkAreaController : MonoBehaviour
 		mCanvasPopUp.SetActive(false);
 		mDeleteFlag = true;
 	}
+
+	
 }
