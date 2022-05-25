@@ -33,6 +33,10 @@ public class ScreenOffIndicator : MonoBehaviour
 		}
 		return true;
 	}
+	float GetGradien(float _x1, float _x2, float _y1, float _y2)
+	{
+		return (_y1 - _y2) / (_x1 - _x2);
+	}
 	public void CreateScreenOffIndicator()
 	{
 		GameObject[] gameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -44,19 +48,38 @@ public class ScreenOffIndicator : MonoBehaviour
 				Transform gameObjectTransform = gameObjects[i].transform;
 				if(!IsTargetVisiable(Camera.main, gameObjectTransform)) //화면 밖에 있으므로 Indicator On ..
 				{
-					if(!mScreenOffIndicatorPrefab.activeInHierarchy)
+					float objectXPos = gameObjectTransform.position.x;
+					float objectYPos = gameObjectTransform.position.y;
+					//	float gradien = GetGradien(Camera.main.transform.position.y, gameObjects[i].transform.position.y, Camera.main.transform.position.x, gameObjects[i].transform.position.x);
+					float gradien = Camera.main.transform.position.y - gameObjects[i].transform.position.y;
+					float screenX = Screen.width;
+					float screenY = Screen.height;
+					string log;
+
+					float indicatorXPos = screenY / gradien / 2;
+					float indicatorYPos = screenX * gradien / 2;
+					log = "gradien -> " + gradien + "\n";
+					log += "Indicator Y Pos -> " + indicatorYPos + "\n";
+					indicatorYPos += screenY / 2;
+					if (indicatorYPos > screenY)
+						indicatorYPos = screenY;
+					else if(indicatorYPos - 100 < 0)
+						indicatorYPos = 100;
+
+
+					if (!mScreenOffIndicatorPrefab.activeInHierarchy)
 						mScreenOffIndicatorPrefab.SetActive(true);
+//					float screenX = Screen.width / 2;
+//					float tmp = (Camera.main.transform.position.y + gameObjectTransform.position.y);
+//					float yPosition = Screen.height / 2 - Screen.height * tmp;
 
-					float screenX = Screen.width / 2;
-					float tmp = (Camera.main.transform.position.y + gameObjectTransform.position.y);
-					float yPosition = Screen.height / 2 - Screen.height * tmp;
-
-					Vector2 indicatorPosition = new Vector2(Screen.width - 100, yPosition); //100은 Indicator크기
+					Vector2 indicatorPosition = new Vector2(Screen.width - 100, indicatorYPos); //100은 Indicator크기
 					Quaternion indicatorRotate = new Quaternion(0, 0, 0, 0);
 					//Instantiate(mScreenOffIndicatorPrefab, indicatorPosition, indicatorRotate); //무한생성 
 					//mScreenOffIndicatorPrefab.transform.position = indicatorPosition;
 
-					string log = "Camera Position -> " + Camera.main.transform.position + "\n";
+					mScreenOffIndicatorPrefab.transform.position = indicatorPosition;
+					log += "Camera Position -> " + Camera.main.transform.position + "\n";
 					log += "object Position -> " + gameObjects[i].transform.position;
 
 					Debug.Log(log);
