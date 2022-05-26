@@ -726,6 +726,7 @@ GameObject:
   - component: {fileID: 3167323989392903036}
   - component: {fileID: 3167323989392903037}
   - component: {fileID: 3550113445216867792}
+  - component: {fileID: -1719876306292126108}
   m_Layer: 6
   m_Name: WorkArea
   m_TagString: WorkArea
@@ -827,6 +828,23 @@ MonoBehaviour:
   mCanvasActiveBtn: {fileID: 6736032700101368936}
   mCanvasSelectBtn: {fileID: 4877312481491689630}
   mCanvasPopUp: {fileID: 7916787091357354284}
+--- !u!114 &-1719876306292126108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167323989392903027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 411060de4483b5e4c9847cd3cbc18554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetColor: {r: 0, g: 1, b: 0.19580078, a: 1}
+  needBoxIndicator: 1
+  needArrowIndicator: 1
+  needDistanceText: 1
+  indicator: {fileID: 0}
 --- !u!1 &3167323991019273154
 GameObject:
   m_ObjectHideFlags: 0
