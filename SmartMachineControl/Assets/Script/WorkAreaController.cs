@@ -61,6 +61,7 @@ public class WorkAreaController : MonoBehaviour
 		SizeChange(); //사이즈 변경
 		StopWatchCheck();
 		PopUpDataCheck();
+		RotateSign();
 	}
 	void SaveFlagIndex() // 배열을 주소값 참조로 변경해야될듯...ㅠㅠㅠㅠㅠㅠㅠ
 	{
@@ -314,6 +315,9 @@ public class WorkAreaController : MonoBehaviour
 		mCanvasPopUp.SetActive(false);
 		mDeleteFlag = true;
 	}
-
-	
+	void RotateSign()
+	{
+		if (mWorkArea.transform.Find("SignType") != null)
+			mWorkArea.transform.Find("SignType").transform.Rotate(new Vector3(0, 100f * Time.deltaTime, 0));
+	}
 }

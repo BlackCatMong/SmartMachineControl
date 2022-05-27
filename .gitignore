@@ -15,7 +15,7 @@
 /MentalCare_CNU/[Bb]uild/
 /MentalCare_CNU/[Bb]uilds/
 /MentalCare_CNU/[Oo]bj/
-
+/IndicatorTest
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta

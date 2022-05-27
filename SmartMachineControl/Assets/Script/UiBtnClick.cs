@@ -11,6 +11,7 @@ public class UiBtnClick : MonoBehaviour
 {
     public GameObject mIndicator;			// 오브젝트 생성 위치 표시 ..
     public GameObject mWorkAreaPrefabs;		// 작업 오브젝트 프리팹
+	public GameObject mWarningAreaPrefabs;	// 위험지역 오브젝트 프리팹 
     public GameObject mCanvas;              // UI 
 
 	public GameObject mDataUI;              //상시 출력 UI...
@@ -18,12 +19,16 @@ public class UiBtnClick : MonoBehaviour
 
     ARRaycastManager mArRaycastManager;		//Ray 관리 .. 
     
-    bool mIndicatorOn;						//오브젝트 생성을 위해 인디케이터 유무 확인 
+    bool mIndicatorOn;                      //오브젝트 생성을 위해 인디케이터 유무 확인 
+	bool mWorkFlag;
+	bool mWarningFlag;
 
     // Start is called before the first frame update
     void Start()
     {
 		mIndicatorOn = false;
+		mWorkFlag = false;
+		mWarningFlag = false;
 		mIndicator = Instantiate(mIndicator);
 		mIndicator.SetActive(false);
 		mArRaycastManager = GetComponent<ARRaycastManager>();
@@ -40,14 +45,44 @@ public class UiBtnClick : MonoBehaviour
 	}
 
     //지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
-    public void CreateCubeClick()
+    public void CreateWorkAreaClick()
     {
-		mIndicatorOn = !mIndicatorOn;
-    }
+		//mIndicatorOn = !mIndicatorOn;
+		mWorkFlag = !mWorkFlag;
+		mWarningFlag = false;
+	}
+	public void CreateWarningAreaClick()
+	{
+		mWarningFlag = !mWarningFlag;
+		mWorkFlag = false;
+	}
     //생성위치 표현용 .. 
     void CreateLocation()
     {
-        Vector2 screenSize = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f); //화면 가운데
+		if (mWorkFlag || mWarningFlag)
+			mIndicatorOn = true;
+		else
+			mIndicatorOn = false;
+
+		if (mIndicatorOn)
+		{
+			gameObject.GetComponent<ARPlaneManager>().enabled = true;
+			foreach (var plane in gameObject.GetComponent<ARPlaneManager>().trackables)
+			{
+				plane.gameObject.SetActive(true);
+			}
+		}
+		else
+		{
+			gameObject.GetComponent<ARPlaneManager>().enabled = false;
+			
+			foreach (var plane in gameObject.GetComponent<ARPlaneManager>().trackables)
+			{
+				plane.gameObject.SetActive(false);
+			}
+		}
+
+		Vector2 screenSize = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f); //화면 가운데
 
         List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
 
@@ -73,16 +108,29 @@ public class UiBtnClick : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             if(touch.phase == TouchPhase.Began && !EventSystem.current.currentSelectedGameObject)
             {
-                Instantiate(mWorkAreaPrefabs, mIndicator.transform.position, mIndicator.transform.rotation);
-				mIndicatorOn = false;
-				Debug.Log("Object Create !!!!!!!!!!!!");
+				if(mWorkFlag)
+				{
+					Instantiate(mWorkAreaPrefabs, mIndicator.transform.position, mIndicator.transform.rotation);
+					mWorkFlag = false;
+					Debug.Log("Work Area Object Create !!!!!!!!!!!!");
+				}
+				else if (mWarningFlag)
+				{
+					Instantiate(mWarningAreaPrefabs, mIndicator.transform.position, mIndicator.transform.rotation);
+					mWarningFlag = false;
+				}
             }
         }
     }
+	void CreateWarningArea()
+	{
+
+	}
+	
     //Button 눌렀을때 버튼 색 변경
     void ButtonCheck()
     {
-        if (mIndicatorOn)
+        if (mWorkFlag)
         {
             GameObject canvasButton = mCanvas.transform.GetChild(0).gameObject;
             canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.pressedColor;
@@ -92,6 +140,17 @@ public class UiBtnClick : MonoBehaviour
             GameObject canvasButton = mCanvas.transform.GetChild(0).gameObject;
             canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.normalColor;
         }
+		if(mWarningFlag)
+		{
+			GameObject canvasButton = mCanvas.transform.GetChild(1).gameObject;
+			canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.pressedColor;
+		}
+		else
+		{
+			GameObject canvasButton = mCanvas.transform.GetChild(1).gameObject;
+			canvasButton.GetComponent<Image>().color = canvasButton.GetComponent<Button>().colors.normalColor;
+		}
+
     }
 
 	System.Random random = new System.Random(); //Test용 데이터 변경 .. 
