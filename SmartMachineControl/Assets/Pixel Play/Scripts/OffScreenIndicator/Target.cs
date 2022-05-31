@@ -25,10 +25,15 @@ public class Target : MonoBehaviour
     /// </summary>
     [HideInInspector] public Indicator indicator;
 
-    /// <summary>
-    /// Gets the color for the target indicator.
-    /// </summary>
-    public Color TargetColor
+
+	private void Update()
+	{
+	
+	}
+	/// <summary>
+	/// Gets the color for the target indicator.
+	/// </summary>
+	public Color TargetColor
     {
         get
         {

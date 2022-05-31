@@ -17,9 +17,11 @@ public class UiBtnClick : MonoBehaviour
 	public GameObject mDataUI;              //상시 출력 UI...
 	string[] mDataUIChildName;
 
-    ARRaycastManager mArRaycastManager;		//Ray 관리 .. 
-    
-    bool mIndicatorOn;                      //오브젝트 생성을 위해 인디케이터 유무 확인 
+    ARRaycastManager mArRaycastManager;     //Ray 관리 .. 
+	ARCameraManager mCameraManager;
+
+
+	bool mIndicatorOn;                      //오브젝트 생성을 위해 인디케이터 유무 확인 
 	bool mWorkFlag;
 	bool mWarningFlag;
 
@@ -33,6 +35,7 @@ public class UiBtnClick : MonoBehaviour
 		mIndicator.SetActive(false);
 		mArRaycastManager = GetComponent<ARRaycastManager>();
 		mDataUIChildName = new string[] { "Date", "Speed", "Gear", "Battery", "WorkTime" };
+		mCameraManager = gameObject.GetComponent<ARSessionOrigin>().transform.GetComponentInChildren<ARCameraManager>();
 	}
 
     // Update is called once per frame
@@ -44,8 +47,8 @@ public class UiBtnClick : MonoBehaviour
 		TestFunc();
 	}
 
-    //지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
-    public void CreateWorkAreaClick()
+	//지정 위치에 Cube 만들기 ... (CreateCube 누를 경우 생성 위치 표시 후 클릭시 그 위치에 생성 .. )
+	public void CreateWorkAreaClick()
     {
 		//mIndicatorOn = !mIndicatorOn;
 		mWorkFlag = !mWorkFlag;
@@ -122,10 +125,6 @@ public class UiBtnClick : MonoBehaviour
             }
         }
     }
-	void CreateWarningArea()
-	{
-
-	}
 	
     //Button 눌렀을때 버튼 색 변경
     void ButtonCheck()
@@ -188,5 +187,16 @@ public class UiBtnClick : MonoBehaviour
 	{
 		GameObject dataUI = mDataUI.transform.Find(mDataUIChildName[4]).gameObject;
 		dataUI.GetComponent<Text>().text = random.Next().ToString();
+	}
+
+	public void DriveBtnClick()
+	{
+		mCameraManager.requestedFacingDirection = CameraFacingDirection.World;
+		Debug.Log("Drive Btn Click -> " + mCameraManager.currentFacingDirection + "//////" + mCameraManager.subsystem + "//////" + mCameraManager.enabled);
+	}
+	public void ReverseBtnClick()
+	{
+		mCameraManager.requestedFacingDirection = CameraFacingDirection.User;
+		Debug.Log("R Btn Click -> " + mCameraManager.currentFacingDirection + "//////" + mCameraManager.subsystem + "//////" + mCameraManager.enabled);
 	}
 }
