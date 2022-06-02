@@ -23,14 +23,14 @@ public class DistanceCheck : MonoBehaviour
 	}
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.name.Length > 0 && !other.name.Equals("DisCheckBoxCol"))
+		if (other.name.Length > 0 && !other.name.Equals("DisCheckBox"))
 		{
 			Debug.Log("OnTriggerEnter -> " + other.name);
 		}
 	}
 	private void OnTriggerStay(Collider other)
 	{
-		if (other.name.Length > 0 && !other.name.Equals("DisCheckBoxCol"))
+		if (other.name.Length > 0 && !other.name.Equals("DisCheckBox"))
 		{
 			Debug.Log("OnTriggerEnter -> " + other.name);
 		}

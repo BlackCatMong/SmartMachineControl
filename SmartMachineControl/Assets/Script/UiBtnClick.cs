@@ -19,6 +19,8 @@ public class UiBtnClick : MonoBehaviour
 
     ARRaycastManager mArRaycastManager;     //Ray 관리 .. 
 	ARCameraManager mCameraManager;
+	ARPlaneManager mPlaneManager;
+	GameObject prefabs;
 
 
 	bool mIndicatorOn;                      //오브젝트 생성을 위해 인디케이터 유무 확인 
@@ -36,6 +38,7 @@ public class UiBtnClick : MonoBehaviour
 		mArRaycastManager = GetComponent<ARRaycastManager>();
 		mDataUIChildName = new string[] { "Date", "Speed", "Gear", "Battery", "WorkTime" };
 		mCameraManager = gameObject.GetComponent<ARSessionOrigin>().transform.GetComponentInChildren<ARCameraManager>();
+		mPlaneManager = gameObject.GetComponent<ARSessionOrigin>().transform.GetComponentInChildren<ARPlaneManager>();
 	}
 
     // Update is called once per frame
@@ -56,8 +59,10 @@ public class UiBtnClick : MonoBehaviour
 	}
 	public void CreateWarningAreaClick()
 	{
+
 		mWarningFlag = !mWarningFlag;
 		mWorkFlag = false;
+
 	}
     //생성위치 표현용 .. 
     void CreateLocation()
@@ -67,9 +72,9 @@ public class UiBtnClick : MonoBehaviour
 		else
 			mIndicatorOn = false;
 
+		ARPlaneManager aRPlaneManager = GetComponent<ARPlaneManager>();
 		if (mIndicatorOn)
 		{
-			gameObject.GetComponent<ARPlaneManager>().enabled = true;
 			foreach (var plane in gameObject.GetComponent<ARPlaneManager>().trackables)
 			{
 				plane.gameObject.SetActive(true);
@@ -77,14 +82,13 @@ public class UiBtnClick : MonoBehaviour
 		}
 		else
 		{
-			gameObject.GetComponent<ARPlaneManager>().enabled = false;
-			
 			foreach (var plane in gameObject.GetComponent<ARPlaneManager>().trackables)
 			{
 				plane.gameObject.SetActive(false);
 			}
+			
 		}
-
+	
 		Vector2 screenSize = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f); //화면 가운데
 
         List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
